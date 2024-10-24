@@ -1,0 +1,126 @@
+---
+// @ts-nocheck
+const { data, theme } = Astro.props;
+
+const CURRENCY_MAP = {
+  AUD: { sym: '$', country: 'Australia', icon: 'au.svg' },
+  BGN: { sym: 'Лв', country: 'Bulgaria', icon: 'bg.svg' },
+  BRL: { sym: 'R$', country: 'Brazil', icon: 'br.svg' },
+  CAD: { sym: '$', country: 'Canada', icon: 'ca.svg' },
+  CHF: { sym: '₣', country: 'Switzerland', icon: 'ch.svg' },
+  CNY: { sym: '¥', country: 'China', icon: 'cn.svg' },
+  CZK: { sym: 'Kč', country: 'Czech Republic', icon: 'cz.svg' },
+  DKK: { sym: 'kr.', country: 'Denmark', icon: 'dk.svg' },
+  GBP: { sym: '£', country: 'Great Britain', icon: 'gb.svg' },
+  HKD: { sym: 'HK$', country: 'Hong Kong', icon: 'hk.svg' },
+  HRK: { sym: 'kn', country: 'Croatia', icon: 'hr.svg' },
+  HUF: { sym: 'Ft', country: 'Hungary', icon: 'hu.svg' },
+  IDR: { sym: 'Rp', country: 'Indonesia', icon: 'id.svg' },
+  ILS: { sym: '₪', country: 'Israel', icon: 'il.svg' },
+  INR: { sym: '₹', country: 'India', icon: 'in.svg' },
+  ISK: { sym: 'Íkr', country: 'Iceland', icon: 'is.svg' },
+  JPY: { sym: '¥', country: 'Japan', icon: 'jp.svg' },
+  KRW: { sym: '₩', country: 'South Korea', icon: 'kr.svg' },
+  MXN: { sym: '$', country: 'Mexico', icon: 'mx.svg' },
+  MYR: { sym: 'RM', country: 'Malaysia', icon: 'my.svg' },
+  NOK: { sym: 'kr', country: 'Norway', icon: 'no.svg' },
+  NZD: { sym: '$', country: 'New Zealand', icon: 'nz.svg' },
+  PHP: { sym: '₱', country: 'Philippines', icon: 'ph.svg' },
+  PLN: { sym: 'zł', country: 'Poland', icon: 'pl.svg' },
+  RON: { sym: 'lei', country: 'Romania', icon: 'ro.svg' },
+  RUB: { sym: '₽', country: 'Russia', icon: 'ru.svg' },
+  SEK: { sym: 'kr', country: 'Sweden', icon: 'se.svg' },
+  SGD: { sym: 'S$', country: 'Singapore', icon: 'sg.svg' },
+  THB: { sym: '฿', country: 'Thailand', icon: 'th.svg' },
+  TRY: { sym: '₺', country: 'Turkey', icon: 'tr.svg' },
+  USD: { sym: '$', country: 'United States', icon: 'us.svg' },
+  ZAR: { sym: 'R', country: 'South Africa', icon: 'za.svg' },
+};
+
+const CURRENCIES = Object.keys(CURRENCY_MAP);
+---
+
+<!-- Modify zing-grid data through API -->
+<zing-grid
+  column-drag
+  column-drag-action='reorder'
+  data={data}
+  gridlines='both'
+  layout-controls='disabled'
+  page-size-options='7,15,25,50,100,200'
+  page-size='7'
+  pager
+  sort
+  zebra
+>
+  <zg-caption>
+    <h2>20 Years of Euro Foreign Exchange Reference Rates</h2>
+    <p>
+      <strong>Source:</strong> European Central Bank's Euro foreign exchange reference
+      rates via Awesome JSON Datasets
+    </p>
+  </zg-caption>
+  <zg-colgroup>
+    <zg-column
+      index='Date'
+      type='date'
+      header='Year'
+      type-date-format='YYYY'
+      drag='disabled'
+      frozen></zg-column>
+    <zg-column
+      index='Date'
+      type='date'
+      header='Date'
+      type-date-format='MMMM DD'
+      drag='disabled'
+      frozen></zg-column>
+
+    {
+      CURRENCIES.map((currency) => (
+        <zg-column
+          index={currency}
+          type='number'
+          filter='disabled'
+          foot-cell='avg'
+        >
+          <div class='cell-wrapper'>
+            <img
+              src={`/flags/${CURRENCY_MAP[currency].icon}`}
+              alt={CURRENCY_MAP[currency].country}
+              width='25'
+              height='25'
+            />
+            <span class='currency-symbol'>{CURRENCY_MAP[currency].sym}</span>
+            <span class='currency-value'>{`[[index.${currency}]]`}</span>
+          </div>
+        </zg-column>
+      ))
+    }
+  </zg-colgroup>
+</zing-grid>
+
+<style>
+  .cell-wrapper {
+    align-items: center;
+    display: flex;
+    gap: 1ch;
+    width: 100%;
+  }
+  .cell-wrapper > img {
+    filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.7));
+    justify-self: flex-end;
+  }
+</style>
+
+<script>
+  // @ts-nocheck
+  const QUERY = 'zing-grid[data-fancy-grid]';
+  let currencyGrids = [...document.querySelectorAll(QUERY)];
+  document.addEventListener('theme-picker-change', (e) => {
+    let theme = e.detail.theme;
+    currencyGrids.forEach((grid) => {
+      grid.setAttribute('theme', theme);
+    });
+  });
+</script>
